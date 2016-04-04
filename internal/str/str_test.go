@@ -7,12 +7,14 @@ import (
 	"github.com/piniondb/pinion/internal/str"
 )
 
+func intStr(val uint) string {
+	return str.Delimit(fmt.Sprintf("%d", val), ",", 3)
+}
+
 func Example_quantity() {
 	for _, val := range []uint{0, 5, 15, 121, 4320, 70123,
 		999321, 4032500, 50100438, 100000054} {
-		fmt.Printf("[%14s] [%s]\n",
-			str.Delimit(fmt.Sprintf("%d", val), ",", 3),
-			str.Quantity(val))
+		fmt.Printf("[%14s] [%s]\n", intStr(val), str.Quantity(val))
 	}
 	// Output:
 	// [             0] [zero]
@@ -34,9 +36,7 @@ func Example_quantityEncode() {
 		999321, 4032500, 50100438, 100000054} {
 		sl, err = str.QuantityEncode(val)
 		if err == nil {
-			fmt.Printf("[%14s] [%s]\n",
-				str.Delimit(fmt.Sprintf("%d", val), ",", 3),
-				str.QuantityDecode(sl))
+			fmt.Printf("[%14s] [%s]\n", intStr(val), str.QuantityDecode(sl))
 		}
 	}
 	if err != nil {
