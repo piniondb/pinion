@@ -7,7 +7,7 @@ import (
 	"github.com/piniondb/pinion/internal/str"
 )
 
-func ExampleQuantity() {
+func Example_quantity() {
 	for _, val := range []uint{0, 5, 15, 121, 4320, 70123, 999321, 4032500, 50100438, 100000054} {
 		fmt.Printf("[%14s] [%s]\n", str.Delimit(fmt.Sprintf("%d", val), ",", 3), str.Quantity(val))
 	}
@@ -24,7 +24,7 @@ func ExampleQuantity() {
 	// [   100,000,054] [one hundred million fifty four]
 }
 
-func ExampleQuantityEncode() {
+func Example_quantityEncode() {
 	var sl []byte
 	var err error
 	for _, val := range []uint{0, 5, 15, 121, 4320, 70123, 999321, 4032500, 50100438, 100000054} {
