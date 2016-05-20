@@ -42,7 +42,7 @@ var (
 )
 
 const (
-	// Version identifies the database compatiblity level
+	// Version identifies the database compatibility level
 	Version = 1
 	// The following loop limit dictates the maximum number of change operations
 	// that can take place in an writeable transaction. It is empirically

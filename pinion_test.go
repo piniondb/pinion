@@ -332,10 +332,53 @@ func indexError(t *testing.T) {
 	}
 }
 
+func rawManipulate(fileStr string, j int) (err error) {
+	var bdb *bolt.DB
+	var q quantityType
+	bdb, err = bolt.Open(fileStr, 0600, nil)
+	if err == nil {
+		err = bdb.Update(func(tx *bolt.Tx) error {
+			var err error
+			switch j {
+			case 0:
+				// Delete record bucket
+				err = tx.DeleteBucket([]byte(q.Name()))
+			case 1:
+				// Delete record data bucket
+				var bck *bolt.Bucket
+				bck = tx.Bucket([]byte(q.Name()))
+				if bck != nil {
+					err = bck.DeleteBucket([]byte{0})
+				} else {
+					err = pinion.ErrRecNotFound
+				}
+			case 2:
+				// Corrupt non-primary reference
+				var bck *bolt.Bucket
+				// var crs *bolt.Cursor
+				var k []byte
+				err = pinion.ErrRecNotFound
+				bck = tx.Bucket([]byte(q.Name()))
+				if bck != nil {
+					bck = bck.Bucket([]byte{1})
+					if bck != nil {
+						k, _ = bck.Cursor().First()
+						if k != nil {
+							err = bck.Put(k, []byte{255})
+						}
+					}
+				}
+			}
+			return err
+		})
+		bdb.Close()
+	}
+	return err
+}
+
 // Intentionally corrupt pinion's database model by modifying database with
 // bolt API
 func internalErrors(t *testing.T) {
-	var bdb *bolt.DB
 	var db *pinion.DB
 	var j int
 	var err error
@@ -345,61 +388,24 @@ func internalErrors(t *testing.T) {
 		db, err = quantityDB(fileStr, 1000, 1005)
 		if err == nil {
 			db.Close()
-			bdb, err = bolt.Open(fileStr, 0600, nil)
+			err = rawManipulate(fileStr, j)
 			if err == nil {
-				err = bdb.Update(func(tx *bolt.Tx) error {
-					var err error
-					switch j {
-					case 0:
-						// Delete record bucket
-						err = tx.DeleteBucket([]byte(q.Name()))
-					case 1:
-						// Delete record data bucket
-						var bck *bolt.Bucket
-						bck = tx.Bucket([]byte(q.Name()))
-						if bck != nil {
-							err = bck.DeleteBucket([]byte{0})
-						} else {
-							err = pinion.ErrRecNotFound
-						}
-					case 2:
-						// Corrupt non-primary reference
-						var bck *bolt.Bucket
-						// var crs *bolt.Cursor
-						var k []byte
-						err = pinion.ErrRecNotFound
-						bck = tx.Bucket([]byte(q.Name()))
-						if bck != nil {
-							bck = bck.Bucket([]byte{1})
-							if bck != nil {
-								k, _ = bck.Cursor().First()
-								if k != nil {
-									err = bck.Put(k, []byte{255})
-								}
-							}
-						}
-					}
-					return err
-				})
-				bdb.Close()
+				db, err = pinion.Open(fileStr, 0600, pinion.Options{})
 				if err == nil {
-					db, err = pinion.Open(fileStr, 0600, pinion.Options{})
-					if err == nil {
-						switch j {
-						case 2:
-							q = quantityType{}
-							err = db.GetRec(&q, idxQuantityVal)
-						default:
-							q.id = 1000
-							err = db.GetRec(&q, idxQuantityID)
-						}
-						if err == nil {
-							t.Fatalf("should not have been able to retrieve record with missing bucket or record")
-						} else {
-							err = nil
-						}
-						db.Close()
+					switch j {
+					case 2:
+						q = quantityType{}
+						err = db.GetRec(&q, idxQuantityVal)
+					default:
+						q.id = 1000
+						err = db.GetRec(&q, idxQuantityID)
 					}
+					if err == nil {
+						t.Fatalf("should not have been able to retrieve record with missing bucket or record")
+					} else {
+						err = nil
+					}
+					db.Close()
 				}
 			}
 		}

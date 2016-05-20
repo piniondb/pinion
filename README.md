@@ -1,5 +1,10 @@
 # pinion
 
+[![MIT licensed](https://img.shields.io/badge/license-MIT-blue.svg)](https://raw.githubusercontent.com/piniondb/pinion/master/LICENSE)
+[![GoDoc](https://godoc.org/github.com/piniondb/pinion?status.svg)](https://godoc.org/github.com/piniondb/pinion)
+[![Build Status](https://travis-ci.org/piniondb/pinion.svg?branch=master)](https://travis-ci.org/piniondb/pinion)
+[![Language](https://img.shields.io/badge/language-go-blue.svg)](https://golang.org/)
+
 Package pinion provides a fast and simple set of routines to manage the storage
 and retrieval of structured records.
 
@@ -21,9 +26,9 @@ Windows platforms.
 ## Example
 
 This example manages records of type personType. This type implements the
-pinion.Record interface; see the heavily commented file person_test.go for more
-details. Note that no type assertions or explicit encoding or decoding needs to
-be done to populate and retrieve records.
+pinion.Record interface; see the heavily commented file [person_test.go][5] for
+more details. Note that no type assertions or explicit encoding or decoding
+needs to be done to populate and retrieve records.
 
     var db *pinion.DB
     var err error
@@ -71,7 +76,7 @@ To install the package on your system, run
 
 The methods of a *pinion.DB instance return an error if the operation fails.
 Since database activity often involves a lot of steps, you may find it useful
-to locally wrap the database instance with Wrap() in order to defer error
+to locally wrap the database instance with [Wrap()][4] in order to defer error
 handling to a single place.
 
 # Keys
@@ -80,7 +85,7 @@ In addition to the required primary index, up to 255 secondary indexes can be
 defined for the record type you want to manage. Only keys in the primary index
 (index 0) need to be unique. Keys must be sortable when inserted into the
 underlying database as byte slices. The piniondb/store package provides support
-for fixed-length key segments. Alternatively, you can use fmt.Sprintf() to
+for fixed-length key segments. Alternatively, you can use [fmt.Sprintf()][3] to
 format fixed-length fields.
 
 # Best practices
@@ -107,3 +112,6 @@ pinion is released under the MIT License.
 
 [1]: https://godoc.org/github.com/boltdb/bolt
 [2]: https://goreportcard.com/report/github.com/piniondb/pinion 
+[3]: https://golang.org/pkg/fmt/#Sprintf
+[4]: https://godoc.org/github.com/piniondb/pinion#DB.Wrap
+[5]: https://github.com/piniondb/pinion/blob/master/person_test.go
