@@ -26,3 +26,10 @@ _testmain.go
 *.db
 coverage
 coverage.html
+*0
+*1
+*2
+*3
+bench*
+.attic
+example/*
