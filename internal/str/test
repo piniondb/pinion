@@ -1,2 +1,0 @@
-go test -v -coverprofile=coverage || exit 1
-go tool cover -html=coverage -o coverage.html || exit 2
