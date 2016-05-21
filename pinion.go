@@ -67,6 +67,10 @@ const (
 // receiver instance itself. They are included here to allow all the
 // information needed for pinion to manage database operations to be specified
 // in one location.
+//
+// It is very important that the implementation of this interface not change
+// after data has been stored. The implementation is in essence a contract
+// between the application and the stored data.
 type Record interface {
 	// Convert the record identified by the method receiver to a byte sequence.
 	encoding.BinaryMarshaler
