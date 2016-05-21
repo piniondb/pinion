@@ -103,7 +103,8 @@ contributing your change to the project. Your pull request should
 
 * be compatible with the MIT License
 * be properly documented
-* include an example a test file (for example, pinion_test.go) if appropriate
+* include an example in one of the test files (for example, pinion_test.go) if
+appropriate
 
 Use the [Go Report Card][2] to assure that no compliance issues have been
 introduced.

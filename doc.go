@@ -103,7 +103,7 @@ format fixed-length fields.
 Best practices
 
 • Implement the pinion.Record interface in the same location at which the
-  structure itself is defined
+structure itself is defined
 
 Contributing Changes
 
@@ -115,7 +115,8 @@ contributing your change to the project. Your pull request should
 
 • be properly documented
 
-• include an example a test file (for example, pinion_test.go) if appropriate
+• include an example in one of the test files (for example, pinion_test.go)
+if appropriate
 
 Use https://goreportcard.com/report/github.com/piniondb/pinion to assure that no
 compliance issues have been introduced.
