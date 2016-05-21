@@ -102,7 +102,7 @@ format fixed-length fields.
 
 Best practices
 
-- Implement the pinion.Record interface in the same location at which the
+• Implement the pinion.Record interface in the same location at which the
   structure itself is defined
 
 Contributing Changes
