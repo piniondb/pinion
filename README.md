@@ -15,7 +15,9 @@ indexes. Its simple programming interface, comprising methods like Put() and
 Get(), operate on types that implement the pinion.Record interface. This
 interface isolates key-building and value-encoding to one place in your
 application. When used with the piniondb/store package, a fast implementation
-of the interface can be made simply that does not require reflection.
+of the interface can be made simply that does not require reflection. Any
+practical number of record types that satisfy the pinion.Record interface can
+be managed by a pinion database.
 
 Currently, pinion does not support joined records. This is obviated to some
 degree with its support for structures that may include maps and slices.
