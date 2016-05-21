@@ -73,10 +73,13 @@ be done to populate and retrieve records.
 	if err != nil {
 		fmt.Println(err)
 	}
-	// Output:
-	// ID           [Carol J Smith / 1] [Robert W Jones / 2]
-	// Last name    [Robert W Jones / 2] [Carol J Smith / 1]
-	// First name   [Carol J Smith / 1] [Robert W Jones / 2]
+
+Running this example produces the following output:
+
+	Output:
+	ID           [Carol J Smith / 1] [Robert W Jones / 2]
+	Last name    [Robert W Jones / 2] [Carol J Smith / 1]
+	First name   [Carol J Smith / 1] [Robert W Jones / 2]
 
 Installation
 
@@ -104,6 +107,9 @@ Best practices
 
 • Implement the pinion.Record interface in the same location at which the
 structure itself is defined
+
+• When working with multiple records, single calls to Add(), Put() and Get()
+will be faster than individual calls to AddRec(), PutRec() and GetRec().
 
 Contributing Changes
 

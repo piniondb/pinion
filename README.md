@@ -12,12 +12,12 @@ and retrieval of structured records.
 
 Pinion automates the task of managing record storage and multiple retrieval
 indexes. Its simple programming interface, comprising methods like Put() and
-Get(), operate on types that implement the pinion.Record interface. This
+Get(), operate on types that implement the [pinion.Record interface][6]. This
 interface isolates key-building and value-encoding to one place in your
-application. When used with the piniondb/store package, a fast implementation
-of the interface can be made simply that does not require reflection. Any
-practical number of record types that satisfy the pinion.Record interface can
-be managed by a pinion database.
+application. When used with the [piniondb/store][7] package, a fast
+implementation of the interface can be made simply that does not require
+reflection. Any practical number of record types that satisfy the pinion.Record
+interface can be managed by a pinion database.
 
 Currently, pinion does not support joined records. This is obviated to some
 degree with its support for structures that may include maps and slices.
@@ -63,10 +63,13 @@ needs to be done to populate and retrieve records.
     if err != nil {
         fmt.Println(err)
     }
-    // Output:
-    // ID           [Carol J Smith / 1] [Robert W Jones / 2]
-    // Last name    [Robert W Jones / 2] [Carol J Smith / 1]
-    // First name   [Carol J Smith / 1] [Robert W Jones / 2]
+
+Running this example produces the following output:
+
+    Output:
+    ID           [Carol J Smith / 1] [Robert W Jones / 2]
+    Last name    [Robert W Jones / 2] [Carol J Smith / 1]
+    First name   [Carol J Smith / 1] [Robert W Jones / 2]
 
 # Installation
 
@@ -93,7 +96,9 @@ format fixed-length fields.
 # Best practices
 
 - Implement the pinion.Record interface in the same location at which the
-  structure itself is defined
+  structure itself is defined.
+- When working with multiple records, single calls to Add(), Put() and Get() will
+  be faster than individual calls to AddRec(), PutRec() and GetRec().
 
 # Contributing Changes
 
@@ -118,3 +123,5 @@ pinion is released under the MIT License.
 [3]: https://golang.org/pkg/fmt/#Sprintf
 [4]: https://godoc.org/github.com/piniondb/pinion#DB.Wrap
 [5]: https://github.com/piniondb/pinion/blob/master/person_test.go
+[6]: https://godoc.org/github.com/piniondb/pinion#Record
+[7]: https://github.com/piniondb/store
