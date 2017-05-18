@@ -10,7 +10,7 @@ type nameType struct {
 	last, middle, first string
 }
 
-// personType is a simple record containing information about an individiual.
+// personType is a simple record containing information about an individual.
 // It is used in various examples. Its fields do not need to be exported.
 type personType struct {
 	id   uint16
