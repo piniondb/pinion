@@ -32,37 +32,40 @@ pinion.Record interface; see the heavily commented file [person_test.go][5] for
 more details. Note that no type assertions or explicit encoding or decoding
 needs to be done to populate and retrieve records.
 
-    var db *pinion.DB
-    var err error
-    var person personType
-    db, err = pinion.Create("example/standalobe.db", 0600, pinion.Options{})
-    if err == nil {
-        wdb := db.Wrap()
-        list := []nameType{
-            {last: "Smith", middle: "J", first: "Carol"},
-            {last: "Jones", middle: "W", first: "Robert"},
+```go
+
+var db *pinion.DB
+var err error
+var person personType
+db, err = pinion.Create("example/standalobe.db", 0600, pinion.Options{})
+if err == nil {
+    wdb := db.Wrap()
+    list := []nameType{
+        {last: "Smith", middle: "J", first: "Carol"},
+        {last: "Jones", middle: "W", first: "Robert"},
+    }
+    wdb.Add(&person, func() bool {
+        if len(list) > 0 {
+            person = personType{id: 0, name: list[0]}
+            list = list[1:]
+            return true
         }
-        wdb.Add(&person, func() bool {
-            if len(list) > 0 {
-                person = personType{id: 0, name: list[0]}
-                list = list[1:]
-                return true
-            }
-            return false
+        return false
+    })
+    for idx := uint8(0); idx < idxPersonCount; idx++ {
+        fmt.Printf("%-12s", personIndexNames[idx])
+        person = personType{} // Start search at beginning with zeroed record
+        wdb.Get(&person, idx, func() bool {
+            fmt.Printf(" [%s]", person)
+            return true
         })
-        for idx := uint8(0); idx < idxPersonCount; idx++ {
-            fmt.Printf("%-12s", personIndexNames[idx])
-            person = personType{} // Start search at beginning with zeroed record
-            wdb.Get(&person, idx, func() bool {
-                fmt.Printf(" [%s]", person)
-                return true
-            })
-            fmt.Println("")
-        }
+        fmt.Println("")
     }
-    if err != nil {
-        fmt.Println(err)
-    }
+}
+if err != nil {
+    fmt.Println(err)
+}
+```
 
 Running this example produces the following output:
 
@@ -79,7 +82,7 @@ To install the package on your system, run
 
 # Errors
 
-The methods of a *pinion.DB instance return an error if the operation fails.
+The methods of a \*pinion.DB instance return an error if the operation fails.
 Since database activity often involves a lot of steps, you may find it useful
 to locally wrap the database instance with [Wrap()][4] in order to defer error
 handling to a single place.
