@@ -23,9 +23,9 @@ import (
 	"testing"
 	"time"
 
-	"github.com/boltdb/bolt"
 	"github.com/piniondb/pinion"
 	"github.com/piniondb/str"
+	"go.etcd.io/bbolt"
 )
 
 func quantityRec(id uint32) (q quantityType) {
@@ -333,11 +333,11 @@ func indexError(t *testing.T) {
 }
 
 func rawManipulate(fileStr string, j int) (err error) {
-	var bdb *bolt.DB
+	var bdb *bbolt.DB
 	var q quantityType
-	bdb, err = bolt.Open(fileStr, 0600, nil)
+	bdb, err = bbolt.Open(fileStr, 0600, nil)
 	if err == nil {
-		err = bdb.Update(func(tx *bolt.Tx) error {
+		err = bdb.Update(func(tx *bbolt.Tx) error {
 			var err error
 			switch j {
 			case 0:
@@ -345,7 +345,7 @@ func rawManipulate(fileStr string, j int) (err error) {
 				err = tx.DeleteBucket([]byte(q.Name()))
 			case 1:
 				// Delete record data bucket
-				var bck *bolt.Bucket
+				var bck *bbolt.Bucket
 				bck = tx.Bucket([]byte(q.Name()))
 				if bck != nil {
 					err = bck.DeleteBucket([]byte{0})
@@ -354,8 +354,8 @@ func rawManipulate(fileStr string, j int) (err error) {
 				}
 			case 2:
 				// Corrupt non-primary reference
-				var bck *bolt.Bucket
-				// var crs *bolt.Cursor
+				var bck *bbolt.Bucket
+				// var crs *bbolt.Cursor
 				var k []byte
 				err = pinion.ErrRecNotFound
 				bck = tx.Bucket([]byte(q.Name()))
@@ -377,7 +377,7 @@ func rawManipulate(fileStr string, j int) (err error) {
 }
 
 // Intentionally corrupt pinion's database model by modifying database with
-// bolt API
+// bbolt API
 func internalErrors(t *testing.T) {
 	var db *pinion.DB
 	var j int

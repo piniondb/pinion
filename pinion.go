@@ -24,7 +24,7 @@ import (
 	"io"
 	"os"
 
-	"github.com/boltdb/bolt"
+	"go.etcd.io/bbolt"
 )
 
 var (
@@ -48,7 +48,7 @@ const (
 	// that can take place in an writeable transaction. It is empirically
 	// determined. If the limit is too low, the high cost of obtaining buckets and
 	// committing becomes a large factor. If the limit is too high, performance
-	// degrades because the uncommitted bolt pages become congested.
+	// degrades because the uncommitted bbolt pages become congested.
 	// Benchmark for 50,000 records:
 	// 100,000: 9.8 s
 	//  25,000: 2.9 s
@@ -93,25 +93,25 @@ type Record interface {
 	NextID(uint64)
 }
 
-// The DB type manages data access with an underlying bolt database. It is safe
+// The DB type manages data access with an underlying bbolt database. It is safe
 // for concurrent goroutine use. Only one instance of this type should be
 // active at a time.
 type DB struct {
-	boltDB *bolt.DB
+	boltDB *bbolt.DB
 	opt    Options
 }
 
 // The Options type is used to configure the database when it is opened.
 type Options struct {
-	BoltOpt bolt.Options
+	BoltOpt bbolt.Options
 	// Consider flag to control whether primary key is concatenated to other keys
 }
 
 // bucketGrpType holds all buckets that store data and indexes for a record
 // type
 type bucketGrpType struct {
-	rec  *bolt.Bucket
-	idxs []*bolt.Bucket
+	rec  *bbolt.Bucket
+	idxs []*bbolt.Bucket
 }
 
 // valType holds a record's data and keys
@@ -124,7 +124,7 @@ type valType struct {
 // specified transaction. If createIfNeeded is true, the bucket will be created
 // if it does not already exist. The transaction must allow writing if
 // createIfNeeded is true.
-func bucket(tx *bolt.Tx, keyStr string, createIfNeeded bool) (bck *bolt.Bucket, err error) {
+func bucket(tx *bbolt.Tx, keyStr string, createIfNeeded bool) (bck *bbolt.Bucket, err error) {
 	key := []byte(keyStr)
 	if createIfNeeded {
 		bck, err = tx.CreateBucketIfNotExists(key)
@@ -141,7 +141,7 @@ func bucket(tx *bolt.Tx, keyStr string, createIfNeeded bool) (bck *bolt.Bucket, 
 // of the current transaction. If createIfNeeded is true, the bucket will be
 // created if it does not already exist. The current transaction must allow
 // writing if createIfNeeded is true.
-func subbucket(parent *bolt.Bucket, parentNameStr string, idx uint8, createIfNeeded bool) (bck *bolt.Bucket, err error) {
+func subbucket(parent *bbolt.Bucket, parentNameStr string, idx uint8, createIfNeeded bool) (bck *bbolt.Bucket, err error) {
 	var key [1]byte
 	key[0] = idx
 	if createIfNeeded {
@@ -158,12 +158,12 @@ func subbucket(parent *bolt.Bucket, parentNameStr string, idx uint8, createIfNee
 // bucketGet retrieves a record's storage buckets. If createIfNeeded is set,
 // the buckets will be created if they do not already exist. The transaction
 // must allow writing if createIfNeeded is true.
-func bucketGet(recPtr Record, count uint8, createIfNeeded bool, tx *bolt.Tx) (bck bucketGrpType, err error) {
+func bucketGet(recPtr Record, count uint8, createIfNeeded bool, tx *bbolt.Tx) (bck bucketGrpType, err error) {
 	if count > 0 {
 		nameStr := recPtr.Name()
 		bck.rec, err = bucket(tx, nameStr, createIfNeeded)
 		if err == nil {
-			bck.idxs = make([]*bolt.Bucket, count)
+			bck.idxs = make([]*bbolt.Bucket, count)
 			for j := uint8(0); j < count && err == nil; j++ {
 				bck.idxs[j], err = subbucket(bck.rec, nameStr, j, createIfNeeded)
 			}
@@ -230,11 +230,11 @@ func (db *DB) Get(recPtr Record, idx uint8, f func() bool) (getErr error) {
 	}
 	count := recPtr.IndexCount()
 	if idx < count {
-		getErr = db.boltDB.View(func(tx *bolt.Tx) (err error) {
+		getErr = db.boltDB.View(func(tx *bbolt.Tx) (err error) {
 			var bck bucketGrpType
 			bck, err = bucketGet(recPtr, count, false, tx)
 			if err == nil {
-				var crs *bolt.Cursor
+				var crs *bbolt.Cursor
 				var key, val []byte
 				loop := true
 				key, err = recPtr.Key(idx)
@@ -295,7 +295,7 @@ func (db *DB) Delete(recPtr Record, f func() bool) (delErr error) {
 	loop := true
 	count := recPtr.IndexCount()
 	for loop && delErr == nil {
-		delErr = db.boltDB.Update(func(tx *bolt.Tx) (err error) {
+		delErr = db.boltDB.Update(func(tx *bbolt.Tx) (err error) {
 			var k uint8
 			var currentVal valType
 			var bck bucketGrpType
@@ -411,7 +411,7 @@ func (db *DB) recPut(recPtr Record, f func() bool, add bool) (putErr error) {
 	createIfNeeded := true
 	put.count = recPtr.IndexCount()
 	for loop && putErr == nil {
-		putErr = db.boltDB.Update(func(tx *bolt.Tx) (err error) {
+		putErr = db.boltDB.Update(func(tx *bbolt.Tx) (err error) {
 			put.bck, err = bucketGet(recPtr, put.count, createIfNeeded, tx)
 			if err == nil {
 				put.scratch = recPtr.New()
@@ -491,7 +491,7 @@ func limit(count int) func() bool {
 }
 
 // hexView is the worker function for HexDump.
-func hexView(wr io.Writer, crs *bolt.Cursor, indent int) {
+func hexView(wr io.Writer, crs *bbolt.Cursor, indent int) {
 	var k, v []byte
 	k, v = crs.First()
 	for k != nil {
@@ -512,7 +512,7 @@ func hexView(wr io.Writer, crs *bolt.Cursor, indent int) {
 // a database.
 func (db *DB) HexDump(wr io.Writer) {
 	if db.boltDB != nil {
-		db.boltDB.View(func(tx *bolt.Tx) (err error) {
+		db.boltDB.View(func(tx *bbolt.Tx) (err error) {
 			hexView(wr, tx.Cursor(), 0)
 			return
 		})
@@ -544,7 +544,7 @@ func exists(path string) (ok bool) {
 
 func open(path string, mode os.FileMode, options Options) (db *DB, err error) {
 	db = new(DB)
-	db.boltDB, err = bolt.Open(path, mode, &options.BoltOpt)
+	db.boltDB, err = bbolt.Open(path, mode, &options.BoltOpt)
 	if err == nil {
 		db.opt = options
 	} else {

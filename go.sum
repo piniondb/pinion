@@ -1,0 +1,8 @@
+github.com/piniondb/store v0.0.0-20220602115210-52755be90993 h1:YBBWmZvYluC0vDfZg7k7j+ay7zmvJ6ddGLmSGVcAc80=
+github.com/piniondb/store v0.0.0-20220602115210-52755be90993/go.mod h1:Yp8iV2avNPcyRY/Th2TywslRqsn3z5LDpA0jWOMaaOY=
+github.com/piniondb/str v0.0.0-20220602120010-9340ca9bdef1 h1:2YNB7AlvHiUZ72VqAdJpUZftR2UslZRMaQtKOSml7Ec=
+github.com/piniondb/str v0.0.0-20220602120010-9340ca9bdef1/go.mod h1:gYqrC8886BOeKv5fltvmSmPbj9uQ4W6aefvU9MXqHr8=
+go.etcd.io/bbolt v1.3.6 h1:/ecaJf0sk1l4l6V4awd65v2C3ILy7MSj+s/x1ADCIMU=
+go.etcd.io/bbolt v1.3.6/go.mod h1:qXsaaIqmgQH0T+OPdb99Bf+PKfBBQVAdyD6TY9G8XM4=
+golang.org/x/sys v0.0.0-20200923182605-d9f96fdee20d h1:L/IKR6COd7ubZrs2oTnTi73IhgqJ71c9s80WsQnh0Es=
+golang.org/x/sys v0.0.0-20200923182605-d9f96fdee20d/go.mod h1:h1NjWce9XRLGQEsW7wpKNCjG9DtNlClVuFLEZdDNbEs=
